@@ -16,16 +16,16 @@ export default function Home() {
     setIsLoading(true);
 
 
-    const name = event.target.name.value;
-    const age = event.target.age.value;
-    const topic = event.target.topic.value;
+    const character = event.target.character.value;
+    const vehicle = event.target.vehicle.value;
+    const style = event.target.style.value;
 
-    const response = await axios.post("/api/create-story", {
-      name,
-      age,
-      topic
+    const response = await axios.post("/api/create-image", {
+      character,
+      vehicle,
+      style
     })
-    // console.log(response.data.answer)
+    console.log(response.data)
     setAnswer(response.data.answer)
     setIsLoading(false);
 
@@ -35,17 +35,24 @@ export default function Home() {
     <div>
       <form onSubmit={note} className="flex flex-col">
 
-        <input className="border-slate-500" type="text" name="name" placeholder="กรอกชื่อ" />
+        <input className="border-slate-500" type="text" name="character" placeholder="กรอกตัวละครหลักของภาพ" />
 
-        <input className="border-slate-500" type="number" name="age" placeholder="กรอกอายุ" />
+        <input className="border-slate-500" type="text" name="vehicle" placeholder="กรอกว่าขี่อะไรอยู่" />
 
-        <input className="border-slate-500" type="text" maxLength="20" name="topic" placeholder="กรอกหัวข้อที่ต้องการ" />
+        <select name="style">
+          <option value="japanese manga">Japanese Manga</option>
+          <option value="disney">Disney</option>
+          <option value="pixar">Pixar</option>
+          <option value="anime">Anime</option>
+          <option value="impressionism painting">impressionism painting</option>
+        </select>
 
         <button type="submit" disabled={isLoading}>{isLoading ? 'Loading' : 'Submit'}</button>
 
       </form>
       <p className="p-4">{isLoading ? 'Loading...' : ''}</p>
       <p className="p-4">{answer}</p>
+      {answer && <img src={answer} className="w-full" />}
     </div>
   );
 }

@@ -7,49 +7,35 @@ const replicate = new Replicate({
 
 export async function POST(req) {
 
-  const { name, age, topic } = await req.json();
-
-
-  const input = {
-    top_k: 50,
-    top_p: 0.9,
-    prompt: `Write a very short bedtime story about ${topic} for my ${age} years-old daughter named ${name}.`,
-    temperature: 0.2,
-    max_new_tokens: 1024,
-    prompt_template: "<s>[INST] {prompt} [/INST] ",
-    presence_penalty: 0,
-    frequency_penalty: 0
-  };
-
-  let answer = "";
-  for await (const event of replicate.stream("mistralai/mixtral-8x7b-instruct-v0.1", { input })) {
-    answer += event.toString();
-    console.log(answer);
-    process.stdout.write(event.toString());
-  };
+  const { character, vehicle, style } = await req.json();
 
   const output = await replicate.run(
-    "stability-ai/stable-diffusion:ac732df83cea7fff18b8472768c88ad041fa750ff7682a21affe81863cbe77e4",
+    "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
     {
       input: {
         width: 768,
         height: 768,
-        prompt: answer,
+        prompt: `${character} riding a ${vehicle} in the stlye of ${style}`,
+        refine: "expert_ensemble_refiner",
         scheduler: "K_EULER",
+        lora_scale: 0.6,
         num_outputs: 1,
         guidance_scale: 7.5,
-        num_inference_steps: 50
+        apply_watermark: false,
+        high_noise_frac: 0.8,
+        negative_prompt: "",
+        prompt_strength: 0.8,
+        num_inference_steps: 25
       }
     }
   );
   console.log(output);
 
 
+
+
   return Response.json({
     status: "ok",
-    answer,
-    output
+    answer: output[0],
   });
-
-
 }
